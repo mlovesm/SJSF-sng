@@ -54,7 +54,7 @@ public class MyFirebaseMessagingService extends com.google.firebase.messaging.Fi
                 intent.putExtra("title",MainFragment.pendingPath+"상세");
 
             }else{
-                intent.putExtra("title","공지사항");
+                intent= new Intent();
             }
 
         }else{
