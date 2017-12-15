@@ -17,7 +17,8 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:layout_below="@+id/layout_top"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:weightSum="1">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="36dp"
@@ -187,19 +188,19 @@
             android:textColor="@color/black"
             android:layout_marginBottom="1dp"
             />
+
         <EditText
             android:id="@+id/editText1"
             android:layout_width="match_parent"
-            android:layout_height="196dp"
-            android:gravity="top"
+            android:layout_height="150dp"
             android:layout_marginTop="1dp"
             android:background="@color/gary_bg"
-            android:padding="5.0dip"
+            android:gravity="top"
             android:hint="내용"
-            android:textColorHint="@color/font_333"
-            android:textSize="15sp"
+            android:padding="5.0dip"
             android:textColor="@color/black"
-            />
+            android:textColorHint="@color/font_333"
+            android:textSize="15sp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -230,50 +231,33 @@
                 android:textColor="@color/black" />
         </LinearLayout>
 
-        <LinearLayout
+        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="1dp"
-            >
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="36dp"
-                android:background="@color/gary_light"
-                android:gravity="center_vertical"
-                android:paddingLeft="10dp"
-                android:text="회신"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="@color/font_333" />
+            android:layout_height="match_parent">
 
-            <EditText
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1.2"
-                android:gravity="center_vertical"
-                android:inputType="text"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:background="@color/white"
-                android:layout_marginBottom="1dp"
-                android:paddingLeft="5dp"
-                />
-            <Button
-                android:id="@id/button1"
-                android:layout_width="0dp"
-                android:layout_weight="0.8"
-                android:layout_height="match_parent"
-                android:layout_gravity="center|right"
-                android:background="@drawable/box_green"
-                android:text="회신"
-                android:textColor="@color/white"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:layout_margin="2dp"
-                />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/re_linear"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:layout_weight="2.57"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editText2"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1.2"
+                    android:background="@color/white"
+                    android:gravity="top"
+                    android:hint="회신"
+                    android:inputType="text"
+                    android:padding="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </ScrollView>
         <!-- 라인 -->
         <LinearLayout
             android:background="@color/gary_line_light"
@@ -283,19 +267,21 @@
 
     <!--버튼-->
     <LinearLayout
-        android:orientation="horizontal"
         android:id="@id/layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:baselineAligned="false"
-        android:layout_alignParentBottom="true">
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:background="@color/blue"
+            android:id="@+id/linear1"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="1.0"
-            android:id="@+id/linear1">
+            android:visibility="gone"
+            android:background="@color/blue">
+
             <TextView
                 android:id="@+id/textButton1"
                 android:layout_width="match_parent"
@@ -306,22 +292,43 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
         <LinearLayout
-            android:background="@color/gary_dark2"
+            android:id="@+id/linear2"
             android:layout_width="0.0dip"
             android:layout_height="50.0dip"
             android:layout_weight="1.0"
-            android:id="@+id/linear2">
+            android:visibility="gone"
+            android:background="@color/gary_dark2">
 
             <TextView
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/font_navtitle"
-                android:gravity="center"
                 android:id="@+id/textButton2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="삭제" />
+                android:gravity="center"
+                android:text="삭제"
+                android:textColor="@color/font_navtitle"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear3"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1.0"
+            android:visibility="gone"
+            android:background="@drawable/box_green">
+
+            <TextView
+                android:id="@+id/textButton3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="회신"
+                android:textColor="@color/font_navtitle"
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 

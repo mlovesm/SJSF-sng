@@ -73,11 +73,13 @@ public class ReciprocityWriteFragment extends Fragment {
     private static final String INSERT_URL = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Safe/reciprocityWrite";
     private static String MODIFY_VIEW_URL = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Safe/reciprocityDetail";
     private static String MODIFY_URL = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Safe/reciprocityModify";
+    private static String REQUEST_URL = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Safe/reciprocityRequest";
     private static String DELETE_URL = MainFragment.ipAddress+ MainFragment.contextPath+"/rest/Safe/reciprocityDelete";
 
     private String mode="";
     private String idx="";
     private String dataSabun;
+    private String perSabun;
 
     @Bind(R.id.top_title) TextView textTitle;
     @Bind(R.id.textView1) TextView tv_userName;
@@ -86,6 +88,7 @@ public class ReciprocityWriteFragment extends Fragment {
     @Bind(R.id.textView4) TextView tv_writerName;
 
     @Bind(R.id.editText1) EditText et_memo;
+    @Bind(R.id.editText2) EditText et_request;
     @Bind(R.id.spinner1) Spinner spn;
     private String selectedPostionKey;  //스피너 선택된 키값
     private int selectedPostion=0;    //스피너 선택된 Row 값
@@ -122,7 +125,8 @@ public class ReciprocityWriteFragment extends Fragment {
 
         if(mode.equals("insert")){
             dataSabun= MainFragment.loginSabun;
-            view.findViewById(R.id.linear2).setVisibility(View.GONE);
+            view.findViewById(R.id.linear1).setVisibility(View.VISIBLE);
+            et_request.setFocusableInTouchMode(false);
             textTitle.setText("자율상호주의 작성");
             tv_date.setText(UtilClass.getCurrentDate("D", "."));
             tv_writerName.setText(MainFragment.loginName);
@@ -171,11 +175,19 @@ public class ReciprocityWriteFragment extends Fragment {
                     if( object != null) {
                         try {
                             dataSabun= object.getJSONArray("datas").getJSONObject(0).get("input_id").toString();
+                            perSabun= object.getJSONArray("datas").getJSONObject(0).get("peer_id").toString();
                             if(MainFragment.loginSabun.equals(dataSabun)){
+                                getActivity().findViewById(R.id.linear1).setVisibility(View.VISIBLE);
+                                getActivity().findViewById(R.id.linear2).setVisibility(View.VISIBLE);
+                                et_request.setFocusableInTouchMode(false);
+
+                            }else if(MainFragment.loginSabun.equals(perSabun)){
+                                et_memo.setFocusableInTouchMode(false);
+                                getActivity().findViewById(R.id.linear3).setVisibility(View.VISIBLE);
+
                             }else{
                                 et_memo.setFocusableInTouchMode(false);
-                                getActivity().findViewById(R.id.linear1).setVisibility(View.GONE);
-                                getActivity().findViewById(R.id.linear2).setVisibility(View.GONE);
+                                et_request.setFocusableInTouchMode(false);
                             }
                             selectedPostionKey = object.getJSONArray("datas").getJSONObject(0).get("unact_cd").toString();
                             selectSabunKey= object.getJSONArray("datas").getJSONObject(0).get("peer_id").toString();
@@ -183,6 +195,7 @@ public class ReciprocityWriteFragment extends Fragment {
                             tv_userSosok.setText(object.getJSONArray("datas").getJSONObject(0).get("peer_sosok").toString().trim());
                             tv_date.setText(object.getJSONArray("datas").getJSONObject(0).get("peer_date").toString());
                             et_memo.setText(object.getJSONArray("datas").getJSONObject(0).get("peer_etc").toString());
+                            et_request.setText(object.getJSONArray("datas").getJSONObject(0).get("request_txt").toString());
                             tv_writerName.setText(object.getJSONArray("datas").getJSONObject(0).get("input_nm").toString());
 
                             modifyDate= tv_date.getText().toString();
@@ -411,11 +424,22 @@ public class ReciprocityWriteFragment extends Fragment {
         }
     }
 
+    @OnClick({R.id.textButton3})
+    public void alertDialogRequest(){
+        if(MainFragment.loginSabun.equals(perSabun)){
+            alertDialog("R");
+        }else{
+            Toast.makeText(getActivity(),"수신자만 가능합니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void alertDialog(final String gubun){
         final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getActivity());
         alertDlg.setTitle("알림");
         if(gubun.equals("S")){
             alertDlg.setMessage("작성하시겠습니까?");
+        }else if(gubun.equals("R")){
+            alertDlg.setMessage("회신하시겠습니까?");
         }else{
             alertDlg.setMessage("삭제하시겠습니까?");
         }
@@ -425,6 +449,8 @@ public class ReciprocityWriteFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 if(gubun.equals("S")){
                     postData();
+                }else if(gubun.equals("R")){
+                    requestData();
                 }else{
                     deleteData();
                 }
@@ -484,9 +510,33 @@ public class ReciprocityWriteFragment extends Fragment {
 
     }
 
+    //회신
+    public void requestData() {
+        String request_txt = et_request.getText().toString();
+        String unact_cd = selectGubunKey;
+
+        if (request_txt.equals("") || request_txt.length()==0) {
+            Toast.makeText(getActivity(), "빈칸을 채워주세요.",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        WebServiceTask wst=null;
+        wst = new WebServiceTask(WebServiceTask.PUT_TASK, getActivity(), "Loading...");
+
+
+        wst.addNameValuePair("writer_sabun",MainFragment.loginSabun);
+        wst.addNameValuePair("writer_name",MainFragment.loginName);
+        wst.addNameValuePair("request_txt",request_txt);
+
+        // the passed String is the URL we will POST to
+        wst.execute(new String[] { REQUEST_URL+"/"+idx });
+
+    }
+
     //작성 완료
     @SuppressLint("LongLogTag")
     public void handleResponse(String response) {
+        UtilClass.logD(TAG,"mode="+mode);
         UtilClass.logD(TAG,"response="+response);
 
         try {
