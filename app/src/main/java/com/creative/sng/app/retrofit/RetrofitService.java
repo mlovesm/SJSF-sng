@@ -65,6 +65,9 @@ public interface RetrofitService {
     @DELETE("{title}/{sub}/{path}")
     Call<Datas> deleteData(@Path("title") String title, @Path("sub") String sub, @Path("path") String path);
 
+    @DELETE("{title}/{sub}/{path}/{path2}/{path3}")
+    Call<Datas> deleteData(@Path("title") String title, @Path("sub") String sub, @Path("path") String path, @Path("path2") String path2, @Path("path3") String path3);
+
     @Streaming
     @GET
     Call<ResponseBody> downloadFile(@Url String fileUrl);

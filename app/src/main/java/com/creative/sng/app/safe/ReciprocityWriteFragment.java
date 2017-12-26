@@ -4,12 +4,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -128,7 +128,7 @@ public class ReciprocityWriteFragment extends Fragment {
             view.findViewById(R.id.linear1).setVisibility(View.VISIBLE);
             et_request.setFocusableInTouchMode(false);
             textTitle.setText("자율상호주의 작성");
-            tv_date.setText(UtilClass.getCurrentDate("D", "."));
+            tv_date.setText(UtilClass.getCurrentDate(1, "."));
             tv_writerName.setText(MainFragment.loginName);
             getPeerLoveCodeData();
         }else{
@@ -567,7 +567,7 @@ public class ReciprocityWriteFragment extends Fragment {
 
         } catch (Exception e) {
             Log.e(TAG, e.getLocalizedMessage(), e);
-            Toast.makeText(getActivity(), "handleResponse Peer",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "handleResponse Recipro",Toast.LENGTH_LONG).show();
         }
 
     }

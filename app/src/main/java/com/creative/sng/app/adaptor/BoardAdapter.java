@@ -19,12 +19,20 @@ public class BoardAdapter extends BaseAdapter{
 	private ArrayList<HashMap<String,Object>> boardList;
 	private ViewHolder viewHolder;
 	private Context con;
+	private String name="";
 
 
 	public BoardAdapter(Context con , ArrayList<HashMap<String,Object>> array){
 		inflater = LayoutInflater.from(con);
 		boardList = array;
 		this.con = con;
+	}
+
+	public BoardAdapter(Context con , ArrayList<HashMap<String,Object>> array, String name){
+		inflater = LayoutInflater.from(con);
+		boardList = array;
+		this.con = con;
+		this.name = name;
 	}
 
 	@Override
@@ -50,11 +58,27 @@ public class BoardAdapter extends BaseAdapter{
 		if(v == null){
 			viewHolder = new ViewHolder();
 
-			v = inflater.inflate(R.layout.basic_list_item, parent,false);
-			viewHolder.board_data1 = (TextView)v.findViewById(R.id.textView1);
-			viewHolder.board_data2 = (TextView)v.findViewById(R.id.textView2);
-			viewHolder.board_data3 = (TextView)v.findViewById(R.id.textView3);
-			viewHolder.board_data4 = (TextView)v.findViewById(R.id.textView4);
+			if(name.equals("NoticeBoard")){
+				v = inflater.inflate(R.layout.basic_list_item, parent,false);
+				viewHolder.board_data1 = (TextView)v.findViewById(R.id.textView1);
+				viewHolder.board_data2 = (TextView)v.findViewById(R.id.textView2);
+				viewHolder.board_data3 = (TextView)v.findViewById(R.id.textView3);
+				viewHolder.board_data4 = (TextView)v.findViewById(R.id.textView4);
+
+			}else if(name.equals("Running")){
+				v = inflater.inflate(R.layout.running_list_item, parent,false);
+				viewHolder.board_data1 = (TextView)v.findViewById(R.id.textView1);
+				viewHolder.board_data2 = (TextView)v.findViewById(R.id.textView2);
+				viewHolder.board_data3 = (TextView)v.findViewById(R.id.textView3);
+				viewHolder.board_data4 = (TextView)v.findViewById(R.id.textView4);
+
+			}else{
+				v = inflater.inflate(R.layout.basic_list_item2, parent,false);
+				viewHolder.board_data1 = (TextView)v.findViewById(R.id.textView1);
+				viewHolder.board_data2 = (TextView)v.findViewById(R.id.textView2);
+				viewHolder.board_data3 = (TextView)v.findViewById(R.id.textView3);
+				viewHolder.board_data4 = (TextView)v.findViewById(R.id.textView4);
+			}
 
 			v.setTag(viewHolder);
 

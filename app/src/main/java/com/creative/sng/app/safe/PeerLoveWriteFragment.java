@@ -3,13 +3,11 @@ package com.creative.sng.app.safe;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,29 +33,8 @@ import com.creative.sng.app.retrofit.RetrofitService;
 import com.creative.sng.app.util.KeyValueArrayAdapter;
 import com.creative.sng.app.util.UtilClass;
 
-import net.jcip.annotations.NotThreadSafe;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -127,7 +104,7 @@ public class PeerLoveWriteFragment extends Fragment {
             dataSabun= MainFragment.loginSabun;
             view.findViewById(R.id.linear2).setVisibility(View.GONE);
             textTitle.setText("동료사랑카드 작성");
-            tv_date.setText(UtilClass.getCurrentDate("D", "."));
+            tv_date.setText(UtilClass.getCurrentDate(1, "."));
             tv_writerName.setText(MainFragment.loginName);
             getPeerLoveCodeData();
         }else{

@@ -1,12 +1,13 @@
 package com.creative.sng.app.fragment;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +22,7 @@ import com.creative.sng.app.equip.EquipPopupActivity;
 import com.creative.sng.app.gear.CheckApprovalFragment;
 import com.creative.sng.app.gear.GearMainFragment;
 import com.creative.sng.app.gear.GearPopupActivity;
+import com.creative.sng.app.gear.RunningTimeFragment;
 import com.creative.sng.app.gear.RunningTimeWriteFragment;
 import com.creative.sng.app.menu.LoginActivity;
 import com.creative.sng.app.menu.MainFragment;
@@ -127,11 +129,11 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
     }
 
     public void onMenuInfo(String title){
-        android.app.Fragment frag = null;
+        Fragment frag = null;
         Bundle bundle = new Bundle();
 
-        fm = getFragmentManager();
-        android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fm = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
         if(title.equals("메인")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new MainFragment());
             String mode= getIntent().getStringExtra("mode");
@@ -151,8 +153,8 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             bundle.putString("selectGearKey",selectGearKey);
             bundle.putString("url", MainFragment.ipAddress+MainFragment.contextPath+"/Gear/gearList.do?gear_cd="+selectGearKey);
 
-        }else if(title.equals("가동시간등록")){
-            fragmentTransaction.replace(R.id.fragmentReplace, frag = new RunningTimeWriteFragment());
+        }else if(title.equals("가동시간")){
+            fragmentTransaction.replace(R.id.fragmentReplace, frag = new RunningTimeFragment());
 
         }else if(title.equals("점검승인")){
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new CheckApprovalFragment());
@@ -167,7 +169,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new DangerMainFragment());
             bundle.putString("selectDaeClassKey",selectDaeClassKey);
             bundle.putString("selectJungClassKey",selectJungClassKey);
-            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_write.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&user_code="+MainFragment.loginSabun);
+            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_write.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&sabun_no="+MainFragment.loginSabun);
 
         }else if(title.equals("위험기계사용점검이력팝업")||title.equals("위험기계사용점검이력")){
             String selectDaeClassKey= getIntent().getStringExtra("selectDaeClassKey");
@@ -177,7 +179,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             bundle.putString("title","위험기계사용점검이력");
             bundle.putString("selectDaeClassKey",selectDaeClassKey);
             bundle.putString("selectJungClassKey",selectJungClassKey);
-            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_check_history.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&user_code="+MainFragment.loginSabun);
+            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_check_history.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&sabun_no="+MainFragment.loginSabun);
 
         }else if(title.equals("설비점검리스트")){
             String gubun= getIntent().getStringExtra("gubun");
@@ -195,7 +197,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             bundle.putString("selectDaeClassKey",selectDaeClassKey);
             bundle.putString("selectJungClassKey",selectJungClassKey);
             bundle.putString("mode","insert");
-            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_write.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&sabun_no="+ sabun_no);
+            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/workPeram_write.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&sabun_no="+ sabun_no);
 
         }else if(title.equals("작업장순회점검이력팝업")||title.equals("작업장순회점검이력")){
             String selectDaeClassKey= getIntent().getStringExtra("selectDaeClassKey");
@@ -205,7 +207,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
             bundle.putString("title","작업장순회점검이력");
             bundle.putString("selectDaeClassKey",selectDaeClassKey);
             bundle.putString("selectJungClassKey",selectJungClassKey);
-            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_check_history.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey
+            bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/workPeram_check_history.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey
                     +"&sabun_no="+ sabun_no+"&j_pos="+ MainFragment.jPos);
 
         }else if(title.equals("자율상호주의")){
@@ -242,9 +244,9 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
         fragmentTransaction.commit();
     }
 
-    public void onFragment(android.app.Fragment fragment, Bundle bundle, String title){
-        FragmentManager fm = getFragmentManager();
-        android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
+    public void onFragment(Fragment fragment, Bundle bundle, String title){
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
 
         fragmentTransaction.replace(R.id.fragmentReplace, fragment);
         fragmentTransaction.addToBackStack(title);
@@ -322,7 +324,7 @@ public class FragMenuActivity extends AppCompatActivity implements NavigationVie
 
         } else if (id == R.id.nav_mate3) {
             intent = new Intent(getApplicationContext(),FragMenuActivity.class);
-            intent.putExtra("title", "가동시간등록");
+            intent.putExtra("title", "가동시간");
 
         } else if (id == R.id.nav_safe1) {
             intent = new Intent(getApplicationContext(),FragMenuActivity.class);

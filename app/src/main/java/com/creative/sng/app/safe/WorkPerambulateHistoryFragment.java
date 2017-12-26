@@ -1,13 +1,14 @@
 package com.creative.sng.app.safe;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -226,7 +227,7 @@ public class WorkPerambulateHistoryFragment extends Fragment {
 
     public void onFragment(Fragment fragment, Bundle bundle, String title){
         FragmentManager fm = getFragmentManager();
-        android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentReplace, fragment);
         fragmentTransaction.addToBackStack(title);
 

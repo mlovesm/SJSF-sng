@@ -110,14 +110,17 @@ public class GearPopupActivity extends Activity {
                 UtilClass.logD("LOG", "KEY : " + adapter.getEntryValue(position));
                 UtilClass.logD("LOG", "VALUE : " + adapter.getEntry(position));
 
-                String driverName= driverNameList[position];
-                _driver_name.setText(driverName);
+//                String driverName= driverNameList[position];
+//                _driver_name.setText(driverName);
 
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+        selectDriver= MainFragment.loginSabun;
+        _driver_name.setText(MainFragment.loginName);
 
     }//onCreate
 

@@ -3,12 +3,12 @@ package com.creative.sng.app.gear;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -31,6 +31,8 @@ import com.androidquery.callback.AjaxStatus;
 import com.creative.sng.app.R;
 import com.creative.sng.app.adaptor.BaseAdapter;
 import com.creative.sng.app.menu.MainFragment;
+import com.creative.sng.app.retrofit.Datas;
+import com.creative.sng.app.retrofit.RetrofitService;
 import com.creative.sng.app.util.KeyValueArrayAdapter;
 import com.creative.sng.app.util.UtilClass;
 
@@ -67,10 +69,15 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RunningTimeWriteFragment extends Fragment {
     private static final String TAG = "RunningTimeWriteFragment";
+    private RetrofitService service;
     private static final String INSERT_URL = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Gear/runningTimeInsert";
+    private static final String MODIFY_URL = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Gear/runningTimeModify";
 
     @Bind(R.id.top_title) TextView textTitle;
     @Bind(R.id.textView1) TextView tv_data1;
@@ -86,8 +93,12 @@ public class RunningTimeWriteFragment extends Fragment {
     private String selectedPostionKey;  //스피너 선택된 키값
     private int selectedPostion=0;    //스피너 선택된 Row 값
 
+    private String selectedPostion2Key;  //스피너2 선택된 키값
+    private int selectedPostion2=0;    //스피너2 선택된 Row 값
+
     private String groupCode;
     private String resultTime;
+    private String calcTime;
 
     private String url = MainFragment.ipAddress+MainFragment.contextPath+"/rest/Gear/workPeramPlaceCodeList";
     private String selectGubunKey="";
@@ -107,6 +118,12 @@ public class RunningTimeWriteFragment extends Fragment {
     private TextView btn_cancel;
     private String selectGearKey="";
     private String selectSabunKey="";
+    private String mode;
+    private String idx;
+
+    private String s_key1;
+    private String s_key2;
+    private String s_key3;
 
     private AQuery aq;
 
@@ -114,26 +131,32 @@ public class RunningTimeWriteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.running_time, container, false);
         ButterKnife.bind(this, view);
+        service= RetrofitService.rest_api.create(RetrofitService.class);
         aq = new AQuery( getActivity() );
 
-        textTitle.setText("가동시간등록");
-        tv_data1.setText(UtilClass.getCurrentDate("D", "."));
-        getworkPeramPlaceCodeData();
-
+        mode= getArguments().getString("mode");
         view.findViewById(R.id.top_save).setVisibility(View.VISIBLE);
 
-        ArrayAdapter adapter = ArrayAdapter.createFromResource(getActivity(), R.array.work_group_list, android.R.layout.simple_spinner_dropdown_item);
-//		spn1.setPrompt("구분을 선택하세요.");
-        spn1.setAdapter(adapter);
-        spn1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                groupCode= parent.getItemAtPosition(position).toString().substring(0,1);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
+        if(mode.equals("insert")){
+            view.findViewById(R.id.linear2).setVisibility(View.GONE);
+            textTitle.setText("가동시간 등록");
+
+            selectSabunKey= MainFragment.loginSabun;
+            tv_data3.setText(MainFragment.loginName);
+
+            tv_data1.setText(UtilClass.getCurrentDate(1, "."));
+
+            spinner1onLoad();
+            getworkPeramPlaceCodeData();
+
+        }else{
+            textTitle.setText("가동시간 수정");
+            idx= getArguments().getString("idx");
+            async_progress_dialog();
+
+        }
+
+        view.findViewById(R.id.top_save).setVisibility(View.VISIBLE);
 
         spn2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -169,22 +192,31 @@ public class RunningTimeWriteFragment extends Fragment {
                         Toast.makeText(getActivity(), "작업전 값이 더 큽니다.",Toast.LENGTH_LONG).show();
                         return;
                     }else{
-                        double result= afterNum-prevNum;
-                        resultTime = String.format("%.1f", result);
-                        int point= resultTime.indexOf(".");
-                        String subResult= resultTime.substring(point+1);
-                        if(subResult.equals("0")){
-                            resultTime= resultTime.substring(0,point);
+                        try {
+                            double result= afterNum-prevNum;
+                            resultTime = String.format("%.2f", result);
+                            int point= resultTime.indexOf(".");
+                            String subResult= resultTime.substring(point+1);
+                            if(subResult.equals("0")){
+                                resultTime= resultTime.substring(0,point);
+                            }
+                            tv_data5.setText(resultTime);
+
+                            //C012 계산
+                            point= resultTime.indexOf(".");
+                            subResult= resultTime.substring(0,point);
+                            String subResult2= resultTime.substring(point+1);
+                            float c012= (float) (Integer.parseInt(subResult2)*0.6);
+
+                            calcTime= UtilClass.addZero(Integer.parseInt(subResult))+UtilClass.addZero((int) c012);
+
+                        }catch (StringIndexOutOfBoundsException e){
+                            e.printStackTrace();
                         }
-                        tv_data5.setText(resultTime);
                     }
                 }
             }
         });
-
-
-
-
 
         et_data2.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -197,6 +229,94 @@ public class RunningTimeWriteFragment extends Fragment {
 
         return view;
     }//onCreateView
+
+    public void spinner1onLoad(){
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(getActivity(), R.array.work_group_list, android.R.layout.simple_spinner_dropdown_item);
+//		spn1.setPrompt("구분을 선택하세요.");
+        spn1.setAdapter(adapter);
+        spn1.setSelection(selectedPostion);
+        spn1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                groupCode= parent.getItemAtPosition(position).toString().substring(0,1);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    public void async_progress_dialog(){
+        RetrofitService service = RetrofitService.rest_api.create(RetrofitService.class);
+
+        final ProgressDialog pDlalog = new ProgressDialog(getActivity());
+        UtilClass.showProcessingDialog(pDlalog);
+
+        Call<Datas> call = service.listData("Gear","runningTimeDetail", idx);
+        call.enqueue(new Callback<Datas>() {
+            @Override
+            public void onResponse(Call<Datas> call, Response<Datas> response) {
+                UtilClass.logD(TAG, "response="+response);
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    String status= response.body().getStatus();
+                    try {
+                        selectSabunKey= response.body().getList().get(0).get("sabun_no").trim();
+
+                        if(MainFragment.loginSabun.equals(selectSabunKey)){
+
+                        }else{
+                            et_data1.setFocusableInTouchMode(false);
+                            et_data2.setFocusableInTouchMode(false);
+                            et_data3.setFocusableInTouchMode(false);
+                            getActivity().findViewById(R.id.linear1).setVisibility(View.GONE);
+                            getActivity().findViewById(R.id.linear2).setVisibility(View.GONE);
+                        }
+                        selectedPostionKey =  response.body().getList().get(0).get("work_group").toString();
+                        selectedPostion2Key = response.body().getList().get(0).get("locater").toString();
+                        selectGearKey = response.body().getList().get(0).get("gear_cd").toString();
+
+                        tv_data1.setText(response.body().getList().get(0).get("input_date").toString());
+                        tv_data2.setText(response.body().getList().get(0).get("gear_gnm").toString());
+                        tv_data3.setText(response.body().getList().get(0).get("work_user").toString());
+
+                        et_data1.setText(response.body().getList().get(0).get("tachomt_before").toString());
+                        et_data2.setText(response.body().getList().get(0).get("tachomt_after").toString());
+                        tv_data5.setText(response.body().getList().get(0).get("running_time").toString());
+                        et_data3.setText(response.body().getList().get(0).get("etc").toString());
+
+                        s_key1= response.body().getList().get(0).get("input_date").toString();
+                        s_key2= response.body().getList().get(0).get("gear_cd").toString();
+                        s_key3= response.body().getList().get(0).get("work_group").toString();
+
+
+                        String[] workGroupList= {"A", "B", "C", "D", "S"};
+                        for(int i=0; i<workGroupList.length;i++){
+                            if(workGroupList[i].equals(selectedPostionKey))  selectedPostion= i;
+                        }
+                        spinner1onLoad();
+
+                        getworkPeramPlaceCodeData();
+
+                    } catch ( Exception e ) {
+                        e.printStackTrace();
+                        Toast.makeText(getActivity(), "에러코드 Running 2", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getActivity(), "response isFailed", Toast.LENGTH_SHORT).show();
+                }
+                if(pDlalog!=null) pDlalog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<Datas> call, Throwable t) {
+                if(pDlalog!=null) pDlalog.dismiss();
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getActivity(), "onFailure Running 1",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 
     @OnClick(R.id.top_home)
     public void goHome() {
@@ -215,11 +335,6 @@ public class RunningTimeWriteFragment extends Fragment {
         }
         aq.progress(dialog).ajax(url, JSONObject.class, this, callback);
 
-    }
-
-    //글 수정 데이터
-    public void getBoardDetailInfo(String url, JSONObject object, AjaxStatus status) throws JSONException {
-        getworkPeramPlaceCodeData();
     }
 
     //장비 조회 데이터
@@ -273,6 +388,7 @@ public class RunningTimeWriteFragment extends Fragment {
         }
     }
 
+    //현장
     public void getworkPeramPlaceCodeData() {
         aq.ajax( url, JSONObject.class, new AjaxCallback<JSONObject>() {
             @Override
@@ -283,7 +399,7 @@ public class RunningTimeWriteFragment extends Fragment {
                         gubunValueList= new String[object.getJSONArray("datas").length()];
                         for(int i=0; i<object.getJSONArray("datas").length();i++){
                             gubunKeyList[i]= object.getJSONArray("datas").getJSONObject(i).get("C001").toString();
-                            if(gubunKeyList[i].equals(selectedPostionKey))  selectedPostion= i;
+                            if(gubunKeyList[i].equals(selectedPostion2Key))  selectedPostion2= i;
                             gubunValueList[i]= object.getJSONArray("datas").getJSONObject(i).get("C002").toString();
                         }
                         KeyValueArrayAdapter adapter = new KeyValueArrayAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item);
@@ -293,7 +409,7 @@ public class RunningTimeWriteFragment extends Fragment {
 
                         spn2.setPrompt("구분");
                         spn2.setAdapter(adapter);
-                        spn2.setSelection(selectedPostion);
+                        spn2.setSelection(selectedPostion2);
                     } catch ( Exception e ) {
 
                     }
@@ -330,13 +446,24 @@ public class RunningTimeWriteFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 //				et_search.setText("position : " + position + parent.getItemAtPosition(position));
 //				search_spi.getSelectedItem().toString();
-                if(position==0){
-                    search_gubun="name";
-                }else if(position==1){
-                    search_gubun="code";
+                if(dialogGubun.equals("G")){
+                    if(position==0){
+                        search_gubun="code";
+                    }else if(position==1){
+                        search_gubun="name";
+                    }else{
+                        search_gubun="";
+                    }
                 }else{
-                    search_gubun="";
+                    if(position==0){
+                        search_gubun="name";
+                    }else if(position==1){
+                        search_gubun="code";
+                    }else{
+                        search_gubun="";
+                    }
                 }
+
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -444,6 +571,15 @@ public class RunningTimeWriteFragment extends Fragment {
 
     }
 
+    @OnClick({R.id.textButton2})
+    public void alertDialogDelete(){
+        if(MainFragment.loginSabun.equals(selectSabunKey)){
+            alertDialog("D");
+        }else{
+            Toast.makeText(getActivity(),"작성자만 가능합니다.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void alertDialog(final String gubun){
         final AlertDialog.Builder alertDlg = new AlertDialog.Builder(getActivity());
         alertDlg.setTitle("알림");
@@ -458,7 +594,8 @@ public class RunningTimeWriteFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 if(gubun.equals("S")){
                     postData();
-
+                }else{
+                    deleteData();
                 }
             }
         });
@@ -470,6 +607,34 @@ public class RunningTimeWriteFragment extends Fragment {
             }
         });
         alertDlg.show();
+    }
+
+    //삭제
+    public void deleteData() {
+        final ProgressDialog pDlalog = new ProgressDialog(getActivity());
+        UtilClass.showProcessingDialog(pDlalog);
+
+        Call<Datas> call = service.deleteData("Gear","runningTimeDelete", s_key1, s_key2, s_key3);
+
+        call.enqueue(new Callback<Datas>() {
+            @Override
+            public void onResponse(Call<Datas> call, Response<Datas> response) {
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    handleResponse(response);
+                }else{
+                    Toast.makeText(getActivity(), "작업에 실패하였습니다.",Toast.LENGTH_LONG).show();
+                }
+                if(pDlalog!=null) pDlalog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<Datas> call, Throwable t) {
+                if(pDlalog!=null) pDlalog.dismiss();
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getActivity(), "handleResponse NoticeBoard",Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     //작성,수정
@@ -486,7 +651,15 @@ public class RunningTimeWriteFragment extends Fragment {
             return;
         }
 
-        WebServiceTask wst = new WebServiceTask(WebServiceTask.POST_TASK, getActivity(), "Loading...");
+        WebServiceTask wst= null;
+        if(mode.equals("insert")){
+            wst = new WebServiceTask(WebServiceTask.POST_TASK, getActivity(), "Loading...");
+        }else{
+            wst = new WebServiceTask(WebServiceTask.PUT_TASK, getActivity(), "Loading...");
+            wst.addNameValuePair("s_key1",s_key1);
+            wst.addNameValuePair("s_key2",s_key2);
+            wst.addNameValuePair("s_key3",s_key3);
+        }
 
         wst.addNameValuePair("writer_sabun",MainFragment.loginSabun);
         wst.addNameValuePair("writer_name",MainFragment.loginName);
@@ -496,11 +669,44 @@ public class RunningTimeWriteFragment extends Fragment {
         wst.addNameValuePair("work_user",selectSabunKey);
         wst.addNameValuePair("work_place",selectGubunKey);
         wst.addNameValuePair("running_time",resultTime);
+        wst.addNameValuePair("calc_time",calcTime);
+        wst.addNameValuePair("tachomt_before",et_data1.getText().toString());
+        wst.addNameValuePair("tachomt_after",et_data2.getText().toString());
         wst.addNameValuePair("running_etc",et_data3.getText().toString());
 
         // the passed String is the URL we will POST to
-        wst.execute(new String[] { INSERT_URL });
+        if(mode.equals("insert")){
+            wst.execute(new String[] { INSERT_URL });
+        }else{
+            wst.execute(new String[] { MODIFY_URL });
+        }
 
+
+
+    }
+
+    //작성 완료
+    public void handleResponse(Response<Datas> response) {
+        try {
+            String status= response.body().getStatus();
+            if(status.equals("success")) getActivity().onBackPressed();
+
+            if(status.equals("successOnPush")){
+                String pushSend= response.body().getList().get(0).get("pushSend").toString();
+
+                if(pushSend.equals("success")){
+                    Toast.makeText(getActivity(), "푸시데이터가 전송 되었습니다.",Toast.LENGTH_LONG).show();
+                }else if(pushSend.equals("empty")){
+                    Toast.makeText(getActivity(), "푸시데이터를 받는 사용자가 없습니다.",Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getActivity(), "푸시 전송이 실패하였습니다.",Toast.LENGTH_LONG).show();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), "작업에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -513,11 +719,8 @@ public class RunningTimeWriteFragment extends Fragment {
             String status= jso.get("status").toString();
 
             if(status.equals("success")){
-                Toast.makeText(getActivity(), "등록 되었습니다.",Toast.LENGTH_LONG).show();
-                tv_data2.setText(""); tv_data5.setText("");
-                et_data1.setText(""); et_data2.setText(""); et_data3.setText("");
-                spn1.setSelection(0);
-                spn2.setSelection(0);
+                getActivity().onBackPressed();
+
             }else{
                 Toast.makeText(getActivity(), "저장에 실패하였습니다.",Toast.LENGTH_LONG).show();
             }

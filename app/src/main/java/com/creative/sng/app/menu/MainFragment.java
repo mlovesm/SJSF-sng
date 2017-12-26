@@ -2,7 +2,6 @@ package com.creative.sng.app.menu;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -211,7 +211,7 @@ public class MainFragment extends Fragment {
     public void download_WebLink() {
         try {
             Log.e("DOWNLOAD", "start");
-            URL url = new URL("http://59.11.9.94:9090/app/apkDown.do?appGubun=pines");
+            URL url = new URL("http://w-cms.co.kr:9090/app/apkDown.do?appGubun=sng");
 
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
@@ -288,7 +288,7 @@ public class MainFragment extends Fragment {
     @OnClick(R.id.imageView3)
     public void getMenu3() {
         Intent intent = new Intent(getActivity(),FragMenuActivity.class);
-        intent.putExtra("title", "가동시간등록");
+        intent.putExtra("title", "가동시간");
         startActivity(intent);
     }
 

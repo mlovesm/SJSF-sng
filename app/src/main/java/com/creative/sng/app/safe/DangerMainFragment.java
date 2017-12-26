@@ -1,13 +1,14 @@
 package com.creative.sng.app.safe;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +35,7 @@ public class DangerMainFragment extends Fragment {
 
     private static final String TAG = "DangerMainFragment";
     private String url;
-    private String user_code;
+    private String sabun_no;
     private String selectDaeClassKey;
     private String selectJungClassKey;
 
@@ -54,7 +55,7 @@ public class DangerMainFragment extends Fragment {
         ButterKnife.bind(this, view);
         dialog = new ProgressDialog(getActivity());
 
-        user_code= getArguments().getString("user_code");
+        sabun_no= getArguments().getString("sabun_no");
         url= getArguments().getString("url");
         selectDaeClassKey= getArguments().getString("selectDaeClassKey");
         selectJungClassKey= getArguments().getString("selectJungClassKey");
@@ -225,7 +226,7 @@ public class DangerMainFragment extends Fragment {
 
     public void onFragment(Fragment fragment, Bundle bundle, String title){
         FragmentManager fm = getFragmentManager();
-        android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentReplace, fragment);
         fragmentTransaction.addToBackStack(title);
 
@@ -252,7 +253,7 @@ public class DangerMainFragment extends Fragment {
         bundle.putString("title","위험기계사용점검이력");
         bundle.putString("selectDaeClassKey",selectDaeClassKey);
         bundle.putString("selectJungClassKey",selectJungClassKey);
-        bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_check_history.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&user_code="+user_code);
+        bundle.putString("url", MainFragment.ipAddress+ MainFragment.contextPath+"/Safe/safe_check_history.do?large_cd="+selectDaeClassKey+"&mid_cd="+selectJungClassKey+"&sabun_no="+sabun_no);
 
     }
 

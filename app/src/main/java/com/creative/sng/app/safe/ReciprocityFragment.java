@@ -1,9 +1,10 @@
 package com.creative.sng.app.safe;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,7 +109,7 @@ public class ReciprocityFragment extends Fragment {
         frag.setArguments(bundle);
 
         FragmentManager fm = getFragmentManager();
-        android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.fragmentReplace, frag);
         fragmentTransaction.addToBackStack("자율상호주의작성");
         fragmentTransaction.commit();
@@ -122,7 +123,7 @@ public class ReciprocityFragment extends Fragment {
             Bundle bundle = new Bundle();
 
             FragmentManager fm = getFragmentManager();
-            android.app.FragmentTransaction fragmentTransaction = fm.beginTransaction();
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
             fragmentTransaction.replace(R.id.fragmentReplace, frag = new ReciprocityWriteFragment());
             bundle.putString("title","자율상호주의상세");
             String key= penaltyArray.get(position).get("key").toString();
