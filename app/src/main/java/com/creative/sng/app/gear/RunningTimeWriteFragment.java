@@ -261,6 +261,8 @@ public class RunningTimeWriteFragment extends Fragment {
                     UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
                     String status= response.body().getStatus();
                     try {
+                        UtilClass.dataNullCheckZero(response.body().getList().get(0));
+
                         selectSabunKey= response.body().getList().get(0).get("sabun_no").trim();
 
                         if(MainFragment.loginSabun.equals(selectSabunKey)){
@@ -284,6 +286,9 @@ public class RunningTimeWriteFragment extends Fragment {
                         et_data2.setText(response.body().getList().get(0).get("tachomt_after").toString());
                         tv_data5.setText(response.body().getList().get(0).get("running_time").toString());
                         et_data3.setText(response.body().getList().get(0).get("etc").toString());
+
+                        resultTime= response.body().getList().get(0).get("running_time").toString();
+                        calcTime= response.body().getList().get(0).get("calc_time").toString();
 
                         s_key1= response.body().getList().get(0).get("input_date").toString();
                         s_key2= response.body().getList().get(0).get("gear_cd").toString();
@@ -720,6 +725,9 @@ public class RunningTimeWriteFragment extends Fragment {
 
             if(status.equals("success")){
                 getActivity().onBackPressed();
+
+            }else if(status.equals("check")){
+                Toast.makeText(getActivity(), "중복된 데이터가 존재합니다.",Toast.LENGTH_LONG).show();
 
             }else{
                 Toast.makeText(getActivity(), "저장에 실패하였습니다.",Toast.LENGTH_LONG).show();

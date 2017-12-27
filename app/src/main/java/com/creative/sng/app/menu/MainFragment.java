@@ -1,7 +1,6 @@
 package com.creative.sng.app.menu;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -76,7 +74,6 @@ public class MainFragment extends Fragment {
     private String INSERT_URL= MainFragment.ipAddress+ MainFragment.contextPath+"/rest/Board/fcmTokenData";
     private String token=null;
     private String phone_num=null;
-    private Activity mActivity;
     public static boolean onAppCheck= false;
     public static String pendingPath= "";
     public static String pendingPathKey= "";
@@ -93,30 +90,6 @@ public class MainFragment extends Fragment {
     public static String latestAppVer;
 
     @Bind(R.id.top_title) TextView textTitle;
-
-    @Override public void onAttach(Context context) {
-        //This method avoid to call super.onAttach(context) if I'm not using api 23 or more
-        if (Build.VERSION.SDK_INT >= 23) {
-            super.onAttach(context);
-            onAttachToContext(context);
-        }
-    }
-
-    /*
-     * Deprecated on API 23
-     * Use onAttachToContext instead
-     */
-    @SuppressWarnings("deprecation")
-    @Override public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (Build.VERSION.SDK_INT < 23) {
-            onAttachToContext(activity);
-        }
-    }
-
-    protected void onAttachToContext(Context context) {
-        this.mActivity = (Activity) context;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -494,7 +467,7 @@ public class MainFragment extends Fragment {
     public String getPhoneNumber() {
         String num = null;
         try {
-            TelephonyManager tm = (TelephonyManager) mActivity.getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
             num = tm.getLine1Number();
             if(num!=null&&num.startsWith("+82")){
                 num = num.replace("+82", "0");

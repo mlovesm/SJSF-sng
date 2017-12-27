@@ -128,10 +128,10 @@ public class WorkStandardMainFragment extends Fragment {
                 Toast.makeText(getActivity(), "에러코드 Work 1", Toast.LENGTH_SHORT).show();
             }
         }else{
-            Log.d(TAG,"Data is Null");
+            UtilClass.logD(TAG,"Data is Null");
             Toast.makeText(getActivity(), "데이터가 없습니다.", Toast.LENGTH_SHORT).show();
         }
-        mAdapter = new BoardAdapter(getActivity(), boardArray);
+        mAdapter = new BoardAdapter(getActivity(), boardArray, "NoticeBoard");
         listView.setAdapter(mAdapter);
     }
 
