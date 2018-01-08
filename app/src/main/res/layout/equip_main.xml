@@ -28,6 +28,7 @@
             android:background="@color/blueviolet"
             android:layout_width="0.0dip"
             android:layout_height="50.0dip"
+            android:visibility="gone"
             android:layout_weight="1.0">
             <TextView
                 android:textSize="22.0sp"
