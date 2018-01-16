@@ -560,7 +560,10 @@ public class RunningTimeWriteFragment extends Fragment {
             }
             if(dialogGubun.equals("G")){
                 selectGearKey= arrayList.get(position).get("gear_cd").toString();
-                tv_data2.setText(arrayList.get(position).get("data1").toString().trim());
+                tv_data2.setText(arrayList.get(position).get("gear_cd").toString().trim());
+
+                tacoData(arrayList.get(position).get("gear_cd").toString().trim());
+
             }else{
                 selectSabunKey= arrayList.get(position).get("sabun_no").toString();
                 tv_data3.setText(arrayList.get(position).get("data2").toString().trim());
@@ -568,6 +571,34 @@ public class RunningTimeWriteFragment extends Fragment {
 
             dismissDialog();
         }
+    }
+
+    //해당 장비 마지막 타코메타 값
+    public void tacoData(String gear_cd) {
+        final ProgressDialog pDlalog = new ProgressDialog(getActivity());
+        UtilClass.showProcessingDialog(pDlalog);
+
+        Call<Datas> call = service.listData("Gear","tacoData", gear_cd);
+
+        call.enqueue(new Callback<Datas>() {
+            @Override
+            public void onResponse(Call<Datas> call, Response<Datas> response) {
+                if (response.isSuccessful()) {
+                    UtilClass.logD(TAG, "isSuccessful="+response.body().toString());
+                    et_data1.setText(UtilClass.numericZeroCheck(response.body().getList().get(0).get("t_after")));
+                }else{
+                    Toast.makeText(getActivity(), "작업에 실패하였습니다.",Toast.LENGTH_LONG).show();
+                }
+                if(pDlalog!=null) pDlalog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<Datas> call, Throwable t) {
+                if(pDlalog!=null) pDlalog.dismiss();
+                UtilClass.logD(TAG, "onFailure="+call.toString()+", "+t);
+                Toast.makeText(getActivity(), "handleResponse TacoData",Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @OnClick({R.id.textButton1, R.id.top_save})

@@ -63,8 +63,8 @@ public class MainFragment extends Fragment {
 
     //    adb shell dumpsys activity activities | findstr "Run"
     private static final String TAG = "MainFragment";
-    public static String ipAddress= "http://119.202.60.107:8585";
-//    public static String ipAddress= "http://192.168.0.22:9191";
+//    public static String ipAddress= "http://119.202.60.107:8585";
+    public static String ipAddress= "http://192.168.0.22:9191";
     public static String contextPath= "/sjsf_sng";
 
     public static String UPLOAD_URL = MainFragment.ipAddress+ MainFragment.contextPath+"/rest/Common/fileUpload";

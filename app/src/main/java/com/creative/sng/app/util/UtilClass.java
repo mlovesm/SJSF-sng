@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -51,16 +52,22 @@ public class UtilClass {
         minute = calendar.get(Calendar.MINUTE);
 
         String returnData;
-        if(gubun==1){
+        if(gubun==1){       //년 월 일
             String _month= UtilClass.addZero(month+1);
             String _day= UtilClass.addZero(day);
             returnData= year+type+_month+type+_day;
-        }else if(gubun==2){
+        }else if(gubun==2){     //년 월 1일
             String _month= UtilClass.addZero(month+1);
             returnData= year+type+_month+type+"01";
-        }else if(gubun==3){
+        }else if(gubun==3){     //년 월
             String _month= UtilClass.addZero(month+1);
             returnData= year+type+_month;
+        }else if(gubun==4){     //어제 년 월 일
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault());
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, -1);  // 오늘 날짜에서 하루를 뺌.
+            String yes_date = sdf.format(cal.getTime());
+            returnData= yes_date;
         }else{
             String _hour= UtilClass.addZero(hour);
             String _minute= UtilClass.addZero(minute);

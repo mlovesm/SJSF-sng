@@ -2,6 +2,7 @@ package com.creative.sng.app.gear;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,8 +10,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,10 +25,12 @@ import com.creative.sng.app.retrofit.Datas;
 import com.creative.sng.app.retrofit.RetrofitService;
 import com.creative.sng.app.util.UtilClass;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +38,8 @@ import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.creative.sng.app.R.id.et_search;
 
 public class RunningTimeFragment extends Fragment {
     private static final String TAG = "RunningTimeFragment";
@@ -45,6 +53,8 @@ public class RunningTimeFragment extends Fragment {
     @Bind(R.id.textButton1) TextView tv_button1;
     @Bind(R.id.textButton2) TextView tv_button2;
 
+    @Bind(R.id.editText1) EditText et_search;
+
     private boolean isSdate=false;
 
     @Override
@@ -57,7 +67,7 @@ public class RunningTimeFragment extends Fragment {
         textTitle.setText(title);
         view.findViewById(R.id.top_write).setVisibility(View.VISIBLE);
 
-        tv_button1.setText(UtilClass.getCurrentDate(2, "."));
+        tv_button1.setText(UtilClass.getCurrentDate(4, "."));
         tv_button2.setText(UtilClass.getCurrentDate(1, "."));
 
         async_progress_dialog();
@@ -71,7 +81,7 @@ public class RunningTimeFragment extends Fragment {
         final ProgressDialog pDlalog = new ProgressDialog(getActivity());
         UtilClass.showProcessingDialog(pDlalog);
 
-        Call<Datas> call = service.listData("Gear","runningTimeList",tv_button1.getText().toString(), tv_button2.getText().toString());
+        Call<Datas> call = service.listDataQ("Gear","runningTimeList",tv_button1.getText().toString(), tv_button2.getText().toString(), et_search.getText().toString());
         call.enqueue(new Callback<Datas>() {
             @Override
             public void onResponse(Call<Datas> call, Response<Datas> response) {
@@ -138,6 +148,21 @@ public class RunningTimeFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
+    //해당 검색값 데이터 조회
+    @OnClick(R.id.imageView1)
+    public void onSearchColumn() {
+        //검색하면 키보드 내리기
+        InputMethodManager imm= (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(et_search.getWindowToken(), 0);
+
+        if(et_search.getText().toString().length()==0){
+            Toast.makeText(getActivity(), "장비명을 입력하세요.", Toast.LENGTH_SHORT).show();
+        }else{
+            async_progress_dialog();
+        }
+
+    }
+
     //날짜설정
     @OnClick(R.id.textButton1)
     public void getDateDialog() {
@@ -151,20 +176,15 @@ public class RunningTimeFragment extends Fragment {
     }
 
     public void getDialog(String gubun) {
-        int year, month, day;
-
-        GregorianCalendar calendar = new GregorianCalendar();
-        year = calendar.get(Calendar.YEAR);
-        month = calendar.get(Calendar.MONTH);
-        day= calendar.get(Calendar.DAY_OF_MONTH);
-
+        TextView textView;
         if(gubun.equals("SD")){
-            DatePickerDialog dialog = new DatePickerDialog(getActivity(), date_listener, year, month, 1);
-            dialog.show();
+            textView= tv_button1;
         }else{
-            DatePickerDialog dialog = new DatePickerDialog(getActivity(), date_listener, year, month, day);
-            dialog.show();
+            textView= tv_button2;
         }
+        DatePickerDialog dialog = new DatePickerDialog(getActivity(), date_listener, UtilClass.dateAndTimeChoiceList(textView, "D").get(0)
+                , UtilClass.dateAndTimeChoiceList(textView, "D").get(1)-1, UtilClass.dateAndTimeChoiceList(textView, "D").get(2));
+        dialog.show();
 
     }
 
