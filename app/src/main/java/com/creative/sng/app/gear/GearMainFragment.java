@@ -237,11 +237,12 @@ public class GearMainFragment extends Fragment {
 
     @OnClick({R.id.textView1, R.id.top_write})
     public void goCheck() {
+        String date= UtilClass.getCurrentDate(1, ".");
         Fragment fragment = new GearCheckFragment();
         Bundle bundle = new Bundle();
         bundle.putString("selectGearKey",selectGearKey);
         bundle.putString("url", MainFragment.ipAddress+MainFragment.contextPath+"/Gear/gearCheck.do?gear_cd="+selectGearKey+"&loginSabun="+MainFragment.loginSabun
-            +"&part1_cd="+MainFragment.part1_cd+"&part2_cd="+MainFragment.part2_cd);
+            +"&input_date="+date);
         bundle.putString("title","장비점검작성");
 
         onFragment(fragment, bundle, "장비점검작성");

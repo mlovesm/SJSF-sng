@@ -63,7 +63,7 @@
         <activity android:name=".safe.WorkPerambulatePopupActivity" android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
         <activity android:name="com.creative.sng.app.fragment.FragMenuActivity"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="sensor">
         </activity>
